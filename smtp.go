@@ -137,6 +137,18 @@ func (d *Dialer) DialAndSend(m ...*Message) error {
 	return Send(s, m...)
 }
 
+// DialAndSendTo opens a connection to the SMTP server, sends the given emails and
+// closes the connection.
+func (d *Dialer) DialAndSendTo(to string, m ...*Message) error {
+	s, err := d.Dial()
+	if err != nil {
+		return err
+	}
+	defer s.Close()
+
+	return SendTo(s, to, m...)
+}
+
 type smtpSender struct {
 	smtpClient
 	d *Dialer

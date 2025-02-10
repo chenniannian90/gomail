@@ -43,6 +43,17 @@ func Send(s Sender, msg ...*Message) error {
 	return nil
 }
 
+// SendTo sends emails using the given Sender.
+func SendTo(s Sender, to string, msg ...*Message) error {
+	for i, m := range msg {
+		if err := sendTo(s, to, m); err != nil {
+			return fmt.Errorf("gomail: could not send email %d: %v", i+1, err)
+		}
+	}
+
+	return nil
+}
+
 func send(s Sender, m *Message) error {
 	from, err := m.getFrom()
 	if err != nil {
@@ -55,6 +66,19 @@ func send(s Sender, m *Message) error {
 	}
 
 	if err := s.Send(from, to, m); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func sendTo(s Sender, to string, m *Message) error {
+	from, err := m.getFrom()
+	if err != nil {
+		return err
+	}
+
+	if err := s.Send(from, []string{to}, m); err != nil {
 		return err
 	}
 
